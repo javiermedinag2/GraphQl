@@ -6,6 +6,7 @@ import graphene
 class User(graphene.ObjectType):
         name = graphene.String()
         id = graphene.ID()
+        email = graphene.String()
 
 # La clase Query define los campos que estarán disponibles en la API GraphQL. En este caso, hay dos campos: "hello" y "Chilpandolfo". Cada campo tiene un resolver que devuelve una cadena de texto personalizada.
 class Query(graphene.ObjectType):
@@ -23,9 +24,9 @@ class Query(graphene.ObjectType):
     # El resolver de "Usuarios" devuelve una lista de usuarios predefinidos. Cada usuario tiene un nombre y un ID. Esta lista se define como una variable de clase dentro de
     def resolve_Usuarios(self, info):
         Usuarios = [
-            User(name="Mustafo", id=1),
-            User(name="Chilpandolfo", id=2),
-            User(name="Mustafo Chilpandolfo", id=3)
+            User(name="Mustafo", id=1, email="mustafo@example.com"),
+            User(name="Chilpandolfo", id=2, email="chilpandolfo@example.com"),
+            User(name="Mustafo Chilpandolfo", id=3, email="mustafochilpandolfo@example.com")
         ]
         return Usuarios
 
