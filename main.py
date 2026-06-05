@@ -3,16 +3,32 @@ from flask import Flask
 from flask_graphql import GraphQLView
 # Graphene es una biblioteca de Python para crear APIs GraphQL. GraphQLView es una vista de Flask que maneja las solicitudes GraphQL.
 import graphene
+class User(graphene.ObjectType):
+        name = graphene.String()
+        id = graphene.ID()
+
 # La clase Query define los campos que estarán disponibles en la API GraphQL. En este caso, hay dos campos: "hello" y "Chilpandolfo". Cada campo tiene un resolver que devuelve una cadena de texto personalizada.
 class Query(graphene.ObjectType):
     hello = graphene.String(name=graphene.String(default_value="stranger"))
     Chilpandolfo = graphene.String(name=graphene.String(default_value="Chilpandolfo"))
+    
+    Usuarios = graphene.List(User)
+ 
     # El resolver de "hello" devuelve un saludo personalizado utilizando el nombre proporcionado. El resolver de "Chilpandolfo" devuelve una cadena que indica que el nombre proporcionado es un gran amigo de Mustafo.
     def resolve_hello(self, info, name):
         return f'Hello {name}!'
     # El resolver de "Chilpandolfo" devuelve un mensaje personalizado que indica que el nombre proporcionado es un gran amigo de Mustafo.
     def resolve_Chilpandolfo(self, info, name):
         return f'{name}! Es un gran amigo de Mustafo.'
+    # El resolver de "Usuarios" devuelve una lista de usuarios predefinidos. Cada usuario tiene un nombre y un ID. Esta lista se define como una variable de clase dentro de
+    def resolve_Usuarios(self, info):
+        Usuarios = [
+            User(name="Mustafo", id=1),
+            User(name="Chilpandolfo", id=2),
+            User(name="Mustafo Chilpandolfo", id=3)
+        ]
+        return Usuarios
+
 # Finalmente, se crea un esquema GraphQL utilizando la clase Query y se configura la aplicación Flask para manejar las solicitudes GraphQL en la ruta "/graphql". La aplicación se ejecuta en modo de depuración en el puerto 5000 y está disponible en todas las interfaces de red.
 schema = graphene.Schema(query=Query)
 app = Flask(__name__)   
