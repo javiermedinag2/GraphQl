@@ -3,11 +3,13 @@ from flask import Flask
 from flask_graphql import GraphQLView
 # Graphene es una biblioteca de Python para crear APIs GraphQL. GraphQLView es una vista de Flask que maneja las solicitudes GraphQL.
 import graphene
+
+# La clase User define un tipo de objeto GraphQL que representa a un usuario. Tiene tres campos: "name", "id" y "email". Cada campo tiene un tipo de dato específico (String, ID, String).
 class User(graphene.ObjectType):
         name = graphene.String()
         id = graphene.ID()
         email = graphene.String()
-
+# Se define una lista de usuarios predefinidos que se utilizarán para responder a las consultas de la API. Cada usuario tiene un nombre, un ID y un correo electrónico.
 Usrs = [
             User(name="Mustafo", id=1, email="mustafo@example.com"),
             User(name="Chilpandolfo", id=2, email="chilpandolfo@example.com"),
@@ -16,6 +18,7 @@ Usrs = [
 
 # La clase Query define los campos que estarán disponibles en la API GraphQL. En este caso, hay dos campos: "hello" y "Chilpandolfo". Cada campo tiene un resolver que devuelve una cadena de texto personalizada.
 class Query(graphene.ObjectType):
+    #Se definen los campos "hello" y "Chilpandolfo" que aceptan un argumento "name" con un valor predeterminado. El campo "Usurio" acepta un argumento "id" que es obligatorio. El campo "Usuarios" devuelve una lista de usuarios.
     hello = graphene.String(name=graphene.String(default_value="stranger"))
     Chilpandolfo = graphene.String(name=graphene.String(default_value="Chilpandolfo"))
     Usurio = graphene.Field(User, id=graphene.ID(required=True))
@@ -26,6 +29,7 @@ class Query(graphene.ObjectType):
     # El resolver de "Chilpandolfo" devuelve un mensaje personalizado que indica que el nombre proporcionado es un gran amigo de Mustafo.
     def resolve_Chilpandolfo(self, info, name):
         return f'{name}! Es un gran amigo de Mustafo.'
+    # El resolver de "Usurio" busca en la lista de usuarios predefinidos y devuelve el usuario que coincide con el ID proporcionado. Si no se encuentra ningún usuario con ese ID, devuelve None.
     def resolve_Usurio(self, info, id):
         for user in Usrs:
             if str(user.id) == id:
@@ -34,7 +38,7 @@ class Query(graphene.ObjectType):
     # El resolver de "Usuarios" devuelve una lista de usuarios predefinidos. Cada usuario tiene un nombre y un ID. Esta lista se define como una variable de clase dentro de
     def resolve_Usuarios(self, info):
         return Usrs
-
+# La clase NewUser define una mutación GraphQL que permite crear un nuevo usuario. La mutación acepta tres argumentos: "id", "name" y "email". El argumento "id" es obligatorio, mientras que "email" es opcional. La mutación crea un nuevo objeto User con los valores proporcionados y lo agrega a la lista de usuarios predefinidos. Luego, devuelve el nuevo usuario creado.
 class NewUser(graphene.Mutation):
     class Arguments:
         id = graphene.Int(required=True)
@@ -45,11 +49,10 @@ class NewUser(graphene.Mutation):
         user = User(name=name, id=id, email=email)
         Usrs.append(user)
         return NewUser(user=user)
-
+# La clase Mutation define los campos de mutación disponibles en la API GraphQL. En este caso, se define una mutación llamada "createUser" que utiliza la clase NewUser para crear un nuevo usuario.
 class Mutation(graphene.ObjectType):
     createUser = NewUser.Field()
     
-
 # Finalmente, se crea un esquema GraphQL utilizando la clase Query y se configura la aplicación Flask para manejar las solicitudes GraphQL en la ruta "/graphql". La aplicación se ejecuta en modo de depuración en el puerto 5000 y está disponible en todas las interfaces de red.
 schema = graphene.Schema(query=Query, mutation=Mutation)
 app = Flask(__name__)   
