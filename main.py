@@ -35,8 +35,23 @@ class Query(graphene.ObjectType):
     def resolve_Usuarios(self, info):
         return Usrs
 
+class NewUser(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int(required=True)
+        name = graphene.String(required=True)
+        email = graphene.String()
+    user = graphene.Field(User)
+    def mutate(self, info, id, name, email=None):
+        user = User(name=name, id=id, email=email)
+        Usrs.append(user)
+        return NewUser(user=user)
+
+class Mutation(graphene.ObjectType):
+    createUser = NewUser.Field()
+    
+
 # Finalmente, se crea un esquema GraphQL utilizando la clase Query y se configura la aplicación Flask para manejar las solicitudes GraphQL en la ruta "/graphql". La aplicación se ejecuta en modo de depuración en el puerto 5000 y está disponible en todas las interfaces de red.
-schema = graphene.Schema(query=Query)
+schema = graphene.Schema(query=Query, mutation=Mutation)
 app = Flask(__name__)   
 # La función add_url_rule se utiliza para agregar una nueva ruta a la aplicación Flask. En este caso, se agrega la ruta "/graphql" que está asociada con la vista GraphQLView. La vista GraphQLView se configura con el esquema GraphQL que se ha definido y se habilita la interfaz gráfica de GraphiQL para facilitar las pruebas de la API.
 app.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True))
